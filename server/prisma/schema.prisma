@@ -1,0 +1,132 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int       @id @default(autoincrement())
+  name      String
+  studentId String?   @unique
+  email     String    @unique
+  phone     String?
+  password  String
+  avatar    String?
+  role      String    @default("user")
+  products  Product[]
+  cartItems CartItem[]
+  sentMessages Message[] @relation("MessageSender")
+  receivedMessages Message[] @relation("MessageRecipient")
+  categoryRequests Category[] @relation("CategoryRequester")
+  addresses Address[]
+  buyerOrders   Order[] @relation("BuyerOrders")
+  sellerOrders  Order[] @relation("SellerOrders")
+  favorites     Favorite[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model Address {
+  id          Int      @id @default(autoincrement())
+  title       String
+  addressText String
+  isDefault   Boolean  @default(false)
+  userId      Int
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Product {
+  id              Int      @id @default(autoincrement())
+  title           String
+  description     String
+  price           Float
+  category        String
+  condition       String
+  image           String?  // Can be a URL
+  meetingLocation String
+  status          String   @default("AVAILABLE")
+  sellerId        Int
+  seller          User     @relation(fields: [sellerId], references: [id])
+  cartItems       CartItem[]
+  messages        Message[]
+  orders          Order[]
+  favorites       Favorite[]
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model CartItem {
+  id        Int      @id @default(autoincrement())
+  quantity  Int      @default(1)
+  userId    Int
+  productId Int
+  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, productId])
+}
+
+model Message {
+  id          Int      @id @default(autoincrement())
+  content     String
+  senderId    Int
+  recipientId Int
+  productId   Int
+  sender      User     @relation("MessageSender", fields: [senderId], references: [id])
+  recipient   User     @relation("MessageRecipient", fields: [recipientId], references: [id])
+  product     Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+}
+
+model Category {
+  id          Int      @id @default(autoincrement())
+  name        String   @unique
+  approved    Boolean  @default(false)
+  requestedBy Int?
+  requester   User?    @relation("CategoryRequester", fields: [requestedBy], references: [id])
+  createdAt   DateTime @default(now())
+}
+
+model Order {
+  id                Int       @id @default(autoincrement())
+  orderNumber       String    @unique
+  buyerId           Int
+  buyer             User      @relation("BuyerOrders", fields: [buyerId], references: [id], onDelete: Cascade)
+  sellerId          Int
+  seller            User      @relation("SellerOrders", fields: [sellerId], references: [id], onDelete: Cascade)
+  productId         Int
+  product           Product   @relation(fields: [productId], references: [id], onDelete: Cascade)
+  quantity          Int       @default(1)
+  price             Float
+  totalAmount       Float
+  status            String    @default("PAID_ESCROW")
+  meetingLocation   String?
+  deliveryAddress   String?
+  buyerPhone        String?
+  sellerPhone       String?
+  sellerDeliveredAt DateTime?
+  buyerReceivedAt   DateTime?
+  sellerPayoutAt    DateTime?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+}
+
+model Favorite {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  productId Int
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([userId, productId])
+}
+
+

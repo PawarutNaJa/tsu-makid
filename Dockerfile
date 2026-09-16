@@ -12,7 +12,7 @@ RUN npm ci --prefix server
 
 COPY . .
 RUN npm run build
-RUN npx prisma generate --schema server/prisma/schema.prisma
+RUN npm run --prefix server prisma:generate
 
 FROM node:20-bookworm-slim
 
@@ -32,4 +32,4 @@ RUN mkdir -p /app/server/prisma/data
 EXPOSE 3000
 
 WORKDIR /app/server
-CMD ["sh", "-c", "npx prisma migrate deploy --schema prisma/schema.prisma && node index.js"]
+CMD ["sh", "-c", "node scripts/init-db.js && node index.js"]

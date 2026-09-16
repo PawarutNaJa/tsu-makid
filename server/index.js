@@ -1,6 +1,16 @@
+const path = require('path');
+const fs = require('fs');
+const dotenv = require('dotenv');
+
+// โหลด Environment Variables ทันทีตั้งแต่เริ่มแอปพลิเคชัน
+const serverEnvPath = path.join(__dirname, '.env');
+const rootEnvPath = path.join(__dirname, '..', '.env');
+if (fs.existsSync(serverEnvPath)) dotenv.config({ path: serverEnvPath });
+if (fs.existsSync(rootEnvPath)) dotenv.config({ path: rootEnvPath });
+
 const express = require('express');
 const cors = require('cors');
-const path = require('path');
+const prisma = require('./db');
 
 const authRoutes = require('./routes/auth');
 const productRoutes = require('./routes/products');
@@ -16,6 +26,29 @@ const PORT = process.env.PORT || 5000;
 
 app.use(cors());
 app.use(express.json({ limit: '4mb' }));
+
+// Health check & Database connection status
+app.get('/api/health', async (req, res) => {
+  try {
+    const userCount = await prisma.user.count();
+    const productCount = await prisma.product.count();
+    res.json({
+      status: 'ok',
+      database: 'connected',
+      counts: {
+        users: userCount,
+        products: productCount
+      },
+      environment: process.env.NODE_ENV || 'development'
+    });
+  } catch (error) {
+    res.status(500).json({
+      status: 'error',
+      database: 'disconnected',
+      error: error.message
+    });
+  }
+});
 
 // Routes
 app.use('/api/auth', authRoutes);

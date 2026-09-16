@@ -64,6 +64,7 @@ jobs:
           host: ${{ secrets.VPS_HOST || '157.254.192.71' }}
           username: ${{ secrets.VPS_USERNAME || 'root' }}
           key: ${{ secrets.VPS_SSH_KEY }}
+          password: ${{ secrets.VPS_PASSWORD }}
           envs: REGISTRY,IMAGE_NAME
           script: |
             set -e

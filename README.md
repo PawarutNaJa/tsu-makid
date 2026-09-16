@@ -62,6 +62,30 @@ npm run dev
 
 อย่าปิดหน้าต่างที่รัน `npm run dev:server` ขณะใช้งานเว็บ เพราะ frontend จะส่งคำขอ `/api` ไปที่ backend พอร์ต 5000
 
+## Deploy ด้วย Docker
+
+บนเซิร์ฟเวอร์ที่ติดตั้ง Docker และ Docker Compose แล้ว ให้เตรียมค่า environment ก่อน:
+
+```powershell
+Copy-Item .env.example .env
+notepad .env
+```
+
+เปลี่ยนค่า `JWT_SECRET` เป็นข้อความสุ่มที่ยาว และเปิดระบบด้วยคำสั่ง:
+
+```powershell
+docker compose up -d --build
+```
+
+ระบบจะให้บริการทั้งหน้าเว็บและ API ที่ `http://เซิร์ฟเวอร์:5000` และจะ migrate ฐานข้อมูลอัตโนมัติเมื่อ container เริ่มทำงาน ฐานข้อมูล SQLite จะถูกเก็บไว้ในโฟลเดอร์ `data/` บนเซิร์ฟเวอร์
+
+ดู log หรือลงระบบใหม่:
+
+```powershell
+docker compose logs -f
+docker compose down
+```
+
 ## แก้ปัญหา 502 หรือ ECONNREFUSED
 
 ข้อผิดพลาดนี้หมายความว่า Vite ติดต่อ backend ที่ `http://localhost:5000` ไม่ได้ ให้ทำตามขั้นตอนนี้:

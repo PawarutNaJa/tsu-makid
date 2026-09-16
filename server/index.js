@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+const path = require('path');
 
 const authRoutes = require('./routes/auth');
 const productRoutes = require('./routes/products');
@@ -26,8 +27,12 @@ app.use('/api/users', userRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/favorites', favoriteRoutes);
 
-app.get('/', (req, res) => {
-  res.send('API is running...');
+// Serve frontend static files
+app.use(express.static(path.join(__dirname, '../dist')));
+
+// Handle React Router, return all requests to React app
+app.get(/.*/, (req, res) => {
+  res.sendFile(path.join(__dirname, '../dist/index.html'));
 });
 
 app.use((error, req, res, next) => {

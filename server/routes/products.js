@@ -4,7 +4,7 @@ const jwt = require('jsonwebtoken');
 
 const router = express.Router();
 const prisma = new PrismaClient();
-const JWT_SECRET = 'supersecret_dormmart_key'; 
+const JWT_SECRET = process.env.JWT_SECRET || 'supersecret_dormmart_key'; 
 const MAX_IMAGE_BYTES = 2 * 1024 * 1024;
 const PRODUCT_STATUSES = ['AVAILABLE', 'RESERVED', 'SOLD'];
 

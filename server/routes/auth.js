@@ -5,9 +5,7 @@ const { PrismaClient } = require('@prisma/client');
 
 const router = express.Router();
 const prisma = new PrismaClient();
-const JWT_SECRET = 'supersecret_dormmart_key'; // In production, move to .env
-
-// Register
+const JWT_SECRET = process.env.JWT_SECRET || 'supersecret_dormmart_key'; // In production, move to .env
 router.post('/register', async (req, res) => {
   try {
     const name = String(req.body.name || '').trim();

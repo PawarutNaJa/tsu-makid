@@ -4,7 +4,7 @@ const jwt = require('jsonwebtoken');
 
 const router = express.Router();
 const prisma = new PrismaClient();
-const JWT_SECRET = 'supersecret_dormmart_key';
+const JWT_SECRET = process.env.JWT_SECRET || 'supersecret_dormmart_key';
 const DEFAULT_CATEGORIES = ['Electronics', 'Furniture', 'Dorm Essentials', 'Books', 'Clothes', 'Others'];
 
 const authenticate = (req, res, next) => {

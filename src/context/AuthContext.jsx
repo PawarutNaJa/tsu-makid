@@ -16,7 +16,12 @@ export const AuthProvider = ({ children }) => {
 
         const normalized = payloadStr.replace(/-/g, '+').replace(/_/g, '/');
         const padded = normalized.padEnd(Math.ceil(normalized.length / 4) * 4, '=');
-        const payload = JSON.parse(atob(padded));
+        
+        // Decode base64 and handle UTF-8 properly (for Thai characters)
+        const base64Decoded = atob(padded);
+        const uint8Array = new Uint8Array(base64Decoded.split('').map(c => c.charCodeAt(0)));
+        const decodedPayload = new TextDecoder().decode(uint8Array);
+        const payload = JSON.parse(decodedPayload);
 
         setUser({
           id: payload.userId || payload.id,

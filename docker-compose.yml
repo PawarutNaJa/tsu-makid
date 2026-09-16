@@ -1,0 +1,19 @@
+services:
+  dormloop-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: dormloop-app
+    restart: unless-stopped
+    ports:
+      # ผูกกับ 127.0.0.1 บนพอร์ต 3002 สำหรับเซิร์ฟเวอร์ VPS (แยกขาดจาก FitMate พอร์ต 3001)
+      - "127.0.0.1:3002:3000"
+    env_file:
+      - .env
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      # ใช้ Full Path แน่นอน 100% เพื่อให้ชี้ตรงกับ Volume เสมอ
+      - DATABASE_URL=file:/app/server/prisma/data/dev.db
+    volumes:
+      - ./data:/app/server/prisma/data

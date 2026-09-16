@@ -1,0 +1,21 @@
+# Docker Compose สำหรับรันบน VPS (เพื่อนนำไปใช้)
+# ตำแหน่งไฟล์บนเซิร์ฟเวอร์: ~/friend-project/compose.yml
+services:
+  dormloop-app:
+    # หากใช้ Docker Image จาก GitHub Container Registry หรือ Docker Hub ให้ระบุชื่อ image
+    # หรือหาก clone repo มา build บน VPS สามารถเปลี่ยนเป็น 'build: .' ได้
+    image: ${DOCKER_IMAGE:-dormloop:latest}
+    container_name: dormloop-app
+    restart: unless-stopped
+    ports:
+      # ผูกเฉพาะกับ 127.0.0.1 เพื่อความปลอดภัย ไม่ชนกับ FitMate (พอร์ต 3001) และไม่เปิดออกอินเทอร์เน็ตตรงๆ
+      - "127.0.0.1:3002:3000"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      # ระบุ Full Path แน่นอน 100% เพื่อให้ชี้ตรงกับ Volume ไม่ว่าจะรันจากโฟลเดอร์ใด
+      - DATABASE_URL=file:/app/server/prisma/data/dev.db
+      - JWT_SECRET=${JWT_SECRET:-dormloop_super_secure_jwt_secret_change_me}
+    volumes:
+      # เก็บฐานข้อมูล SQLite ไว้ที่โฟลเดอร์ data บน Host ทำให้ข้อมูลไม่หายเวลารีสตาร์ตหรืออัปเดตแอป
+      - ./data:/app/server/prisma/data
